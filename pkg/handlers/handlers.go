@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"cpratap/samplewebapp/pkg/config"
+	"cpratap/samplewebapp/pkg/models"
 	"cpratap/samplewebapp/pkg/render"
 	"net/http"
 )
@@ -24,6 +25,9 @@ func NewHandlers(r *Repository) {
 
 func (m *Repository) HomePageHandler(responseWriter http.ResponseWriter, request *http.Request) {
 
-	render.RenderTemplate(responseWriter, "home.page.tmpl")
+	tmpStringMap := make(map[string]string)
+	tmpStringMap["projName"] = "LearnGo web Rest"
+
+	render.RenderTemplate(responseWriter, "home.page.tmpl", &models.TemplateData{StringMap: tmpStringMap})
 
 }
