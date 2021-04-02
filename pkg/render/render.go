@@ -3,7 +3,6 @@ package render
 import (
 	"bytes"
 	"cpratap/samplewebapp/pkg/config"
-	"cpratap/samplewebapp/pkg/models"
 	"html/template"
 	"log"
 	"net/http"
@@ -19,7 +18,7 @@ func NewTemplates(a *config.AppConfig) {
 	app = a
 }
 
-func RenderTemplate(responseWriter http.ResponseWriter, tmpl string, templateData *models.TemplateData) {
+func RenderTemplate(responseWriter http.ResponseWriter, tmpl string) {
 
 	var templateCache map[string]*template.Template
 	if app.UseCache {
@@ -35,7 +34,7 @@ func RenderTemplate(responseWriter http.ResponseWriter, tmpl string, templateDat
 	}
 
 	buffer := new(bytes.Buffer)
-	_ = template.Execute(buffer, templateData)
+	_ = template.Execute(buffer, nil)
 	_, _ = buffer.WriteTo(responseWriter)
 
 }
