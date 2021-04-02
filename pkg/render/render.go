@@ -1,45 +1,32 @@
 package render
 
 import (
-	"bytes"
-	"cpratap/samplewebapp/pkg/config"
+	"fmt"
 	"html/template"
-	"log"
 	"net/http"
 	"path/filepath"
 )
 
 var functions = template.FuncMap{}
 
-var app *config.AppConfig
-
-//sets the config for the template package
-func NewTemplates(a *config.AppConfig) {
-	app = a
-}
-
 func RenderTemplate(responseWriter http.ResponseWriter, tmpl string) {
 
-	var templateCache map[string]*template.Template
-	if app.UseCache {
-		templateCache = app.TemplateCache
-	} else {
-		templateCache, _ = CreateTemplateCache()
+	baseMap, err := renderBaseLayout(responseWriter)
+	if err != nil {
+		fmt.Println("Error occured")
+		return
 	}
+	fmt.Println(baseMap)
 
-	template, ok := templateCache[tmpl]
+	parsedTemplate, _ := template.ParseFiles("../../templates/" + tmpl)
+	err = parsedTemplate.Execute(responseWriter, nil)
 
-	if !ok {
-		log.Fatal("Fatal problem")
+	if err != nil {
+		fmt.Println("Error occured while parsing template", err)
 	}
-
-	buffer := new(bytes.Buffer)
-	_ = template.Execute(buffer, nil)
-	_, _ = buffer.WriteTo(responseWriter)
-
 }
 
-func CreateTemplateCache() (map[string]*template.Template, error) {
+func renderBaseLayout(w http.ResponseWriter) (map[string]*template.Template, error) {
 
 	myCache := map[string]*template.Template{}
 
@@ -50,6 +37,8 @@ func CreateTemplateCache() (map[string]*template.Template, error) {
 
 	for _, page := range pages {
 		name := filepath.Base(page)
+
+		fmt.Println(name)
 		ts, err := template.New(name).Funcs(functions).ParseFiles(page)
 
 		if err != nil {
